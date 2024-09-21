@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Detector</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>AI Content Detector</h1>
+
+        <h3>Check if a text is AI-generated</h3>
+        <textarea id="text-input" rows="5" cols="50" placeholder="Enter text here..."></textarea>
+        <br>
+        <button onclick="checkText()">Check Text</button>
+        
+        <h3>Check if an image is AI-generated</h3>
+        <input type="file" id="image-input" accept="image/*">
+        <br>
+        <button onclick="checkImage()">Check Image</button>
+
+        <div class="result">
+            <h4>Result:</h4>
+            <p id="result"></p>
+        </div>
+    </div>
+
+    <script>
+        async function checkText() {
+            const text = document.getElementById("text-input").value;
+            const response = await fetch('http://127.0.0.1:5000/predict-text', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: text })
+            });
+            const result = await response.json();
+            document.getElementById("result").innerText = `AI-generated likelihood: ${result.ai_generated_percentage}%`;
+        }
+
+        async function checkImage() {
+            const imageFile = document.getElementById("image-input").files[0];
+            const formData = new FormData();
+            formData.append("image", imageFile);
+
+            const response = await fetch('http://127.0.0.1:5000/predict-image', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            document.getElementById("result").innerText = `AI-generated likelihood: ${result.ai_generated_percentage}%`;
+        }
+    </script>
+</body>
+</html>
